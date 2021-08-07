@@ -139,7 +139,7 @@ asc2=double(a2);
 err=max(abs(asc-asc2));
 
 uni=unique(asc);
-size_of_file=length(a)*log2(length(uni));
+size_of_file=length(a)*log2(
 
 size_of_encoded=length(a_read);
         
