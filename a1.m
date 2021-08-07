@@ -5,7 +5,7 @@
 % a 256X128 matrix which have 1 where the column no has the row no as its
 % children. all M[i,j]=0 initially.
 clear;
-fi=fopen("File__3.txt",'r');
+fi=fopen("File__2.txt",'r');
 
 a=fscanf(fi,"%c");  % a contains all the scanned characters
 
@@ -44,6 +44,8 @@ end
 pind=pind-1;
 root=pind;                      % copies needed during codeword formation
 parent1=parent;                 % copies needed during codeword formation
+parent2=parent;                 % copy needed during decoding
+parent3=parent;
 depth(pind)=0;                      % intializing the depth to zero
 
 while(pind>128)
@@ -79,26 +81,60 @@ pind=pind-1;                    % decrementing pind
 end
 
 code=codewords(1:1:128);
-fi2=fopen('File_3_Hcode.txt','w');
+fi2=fopen('File_2_Hcode.txt','w');
 encoder=2.*ones(128,30);
 
 for z=1:128
    temp=de2bi(code(z),'left-msb');
    [max_val,max_ind]=max(temp);
-   fprintf(fi2,'%3d ',z-1);
+   fprintf(fi2,"%3d ",z-1);
    for q=max_ind+1:length(temp)
        encoder(z,q-max_ind)=temp(q);
-       fprintf(fi2,'%d',temp(q));
+       fprintf(fi2,"%d",temp(q));
    end
    fprintf(fi2,'\n');
 end
 
-fi3=fopen('File_3_encode.txt','w');
+fi3=fopen('File_2_encode.txt','w');
 for z=1:length(asc)
    for k=1:length(encoder(asc(z),:))
        if(encoder(asc(z),k)==2)
        break;
        end
-       fprintf(fi3,'%d',encoder(asc(z),k));
+       fprintf(fi3,"%d",encoder(asc(z),k));
    end
 end
+
+fi4=fopen('File_2_encode.txt','r');
+a_read=fscanf(fi4,"%1d");
+
+fi5=fopen('File_2_decode.txt','w');
+
+pind=root;                     % needed during decoding
+
+for z=1:length(a_read)
+    [max_val1,max_ind1]=max(parent2(:,pind-128));
+    parent2(max_ind1,pind-128)=0;
+    
+    [max_val2,max_ind2]=max(parent2(:,pind-128));
+    parent2(max_ind2,pind-128)=0;
+    
+    if(a_read(z)==0)
+        pind=max_ind1;
+    else
+        pind=max_ind2;
+    end
+    
+    if(pind<129)
+        fprintf(fi5,"%c",pind);
+        pind=root;
+        parent2=parent3;
+    end
+end
+
+fi6=fopen('File_2_decode.txt','r');
+a2=fscanf(fi6,"%c");
+asc2=double(a2);
+
+err=max(abs(asc-asc2));
+        
